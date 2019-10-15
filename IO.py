@@ -2,7 +2,7 @@
 # Narciso López López
 # Andrea Vázquez Varela
 #Creation date: 19/05/2019
-#Last update: 08/06/2019
+#Last update: 15/10/2019
 
 import shutil
 import os
@@ -12,9 +12,6 @@ def create_dirs(path):
     if os.path.exists(path):
         shutil.rmtree(path)
     os.mkdir(path)
-    atlas_path = path+"/final_atlas"
-    os.mkdir(atlas_path)
-    return atlas_path
 
 #Lee las etiquetas del atlas
 def read_labels(path):
@@ -53,4 +50,11 @@ def write_hparcels(aparcels,atlas_path,hemi):
                     for t in hp.triangles:  #Se escriben los índices de los triángulos
                         f.write(" "+str(t.index))
                     f.write("\n")
+    f.close()
+
+def write_labels(labels,atlas_path,hemi):
+    file_path = atlas_path+"/"+hemi+"vertex_labels.txt"
+    f = open(file_path,"w+")
+    for label in labels:
+        f.write(str(label)+"\n")
     f.close()

@@ -2,7 +2,7 @@
 # Narciso López López
 # Andrea Vázquez Varela
 #Creation date: 19/05/2019
-#Last update: 11/10/2019
+#Last update: 15/10/2019
 
 import random
 import scipy
@@ -165,7 +165,7 @@ def fit_desikan(matrix,pointlist,k):
     return nodes_group
 
 def fit_all(matrix,pointlist,k):
-    if k > 2 and matrix != None:
+    if k > 1 and matrix != None:
         nodes_group = []
         centers = get_random_centers(k,matrix)
         #centers = initialize(pointlist, k)
@@ -175,19 +175,15 @@ def fit_all(matrix,pointlist,k):
         groups = create_groups (centers,matrix)
 
         for i in range(20):
-            print("iteración "+str(i))
             pool = mp.Pool(mp.cpu_count())
-            #pool = mp.Pool(1)
             centers_fun = partial(recalc_center_all, matrix)
             results = pool.map(centers_fun, [group for group in groups.items()])
             centers = merge_centroids(results)
             pool.close()
             noChange = stop_critery(pointlist,centers,centers_tmp)
             centers_tmp = centers
-            print("calculando grupos")
             groups = create_groups(centers, matrix)
             if noChange:
-                print("salió")
                 break
         for key,group in groups.items():
             nodes_group.append(group)
