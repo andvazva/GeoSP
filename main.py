@@ -18,7 +18,6 @@ import collections
 created_sparcels = []
 NPARCELS = 36  # Son 36 parcelas de desikan
 
-#
 def labeling(polygons,points,labels):
     triangles = []
     aparcels = []
