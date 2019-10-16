@@ -2,7 +2,7 @@
 # Narciso López López
 # Andrea Vázquez Varela
 #Creation date: 19/05/2019
-#Last update: 15/10/2019
+#Last update: 16/10/2019
 
 import shutil
 import os
@@ -15,15 +15,9 @@ def create_dirs(path):
 
 #Lee las etiquetas del atlas
 def read_labels(path):
-    labels = []
-    file = open(path,"r+")
-    lines = file.readlines()
-    for line in lines:
-        label = int(line)
-        if label == -1:
-            label = 0
-        labels.append(label)
-    file.close()
+    with open(path,"r+") as f:
+        lines = f.readlines()
+        labels = list([int(l) for l in line.split()][0] for line in lines)
     return labels
 
 #Lee los valores de k para kmeans
@@ -53,7 +47,7 @@ def write_hparcels(aparcels,atlas_path,hemi):
     f.close()
 
 def write_labels(labels,atlas_path,hemi):
-    file_path = atlas_path+"/"+hemi+"vertex_labels.txt"
+    file_path = atlas_path+"/"+hemi+"labels.txt"
     f = open(file_path,"w+")
     for label in labels:
         f.write(str(label)+"\n")

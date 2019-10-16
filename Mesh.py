@@ -2,34 +2,11 @@
 # Narciso López López
 # Andrea Vázquez Varela
 #Creation date: 19/05/2019
-#Last update: 19/05/2019
+#Last update: 16/10/2019
 
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 import numpy as np
-
-class Vertex:
-    def __init__(self,index,points):
-        self.index = index
-        self.points = points
-        self.label_sparcel = -1
-
-class Triangle:
-    def __init__(self,index,label,v0,v1,v2):
-        self.index = index
-        self.label = label
-        self.label_sparcel = -1
-        self.v0 = v0
-        self.v1 = v1
-        self.v2 = v2
-
-class Parcel:
-    def __init__(self,label):
-        self.label = label
-        self.parent = None
-        self.triangles = []
-        self.sub_parcels = []
-
 
 class Mesh():
     def __init__(self,path):
