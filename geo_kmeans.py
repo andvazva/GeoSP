@@ -2,7 +2,7 @@
 # Narciso López López
 # Andrea Vázquez Varela
 #Creation date: 19/05/2019
-#Last update: 15/10/2019
+#Last update: 16/10/2019
 
 import random
 import scipy
@@ -17,14 +17,14 @@ nodes_map = {} #Mapa que contiene los índices de los nodos como clave y los obj
 def get_random_centers(k,matrix):
     random_centers = []
     for i in range(k):
-        random_index = random.randrange(0, matrix.shape[0], 1)
+        random_index = random.choice(list(set(matrix.indices)))
         random_centers.append(random_index)
     return random_centers
 
 #Kmeans ++
 def initialize(X, K):
     init = random.choice(np.arange(K))
-    init = 0
+    #init = 0
     C = [X[init]]
     C_indices = [init]
     for k in range(1, K):
@@ -48,17 +48,18 @@ def create_groups(centers,matrix):
     for c in centers:
         dist_matrices[c] = scipy.sparse.csgraph.dijkstra(matrix, directed=False, indices=c, return_predecessors=False, unweighted=False)
 
-    for node in range((matrix).shape[0]):
+    for node in set(matrix.indices):
         min = 10000000
         selected_center = -1
         for c,matrix in dist_matrices.items():
             if matrix[node] < min:
                 min = matrix[node]
                 selected_center = c
-        if selected_center not in groups:
-            groups[selected_center] = [node]
-        else:
-            groups[selected_center].append(node)
+        if selected_center != -1:
+            if selected_center not in groups:
+                groups[selected_center] = [node]
+            else:
+                groups[selected_center].append(node)
 
     return groups
 
@@ -68,7 +69,6 @@ def recalc_center(matrix,groups):
         indices = group[1]
         group_matrix = matrix[indices,:][:,indices]
         D = scipy.sparse.csgraph.floyd_warshall(group_matrix, directed=False, unweighted=False)
-        #D = scipy.sparse.csgraph.johnson(group_matrix, directed=False, indices=None, return_predecessors=False, unweighted=False)
         n = D.shape[0]
         max_value = -1
         selected_center = -1
@@ -93,7 +93,6 @@ def recalc_center_all(matrix,group):
     indices = group[1]
     group_matrix = matrix[indices,:][:,indices]
     D = scipy.sparse.csgraph.floyd_warshall(group_matrix, directed=False, unweighted=False)
-    #D = scipy.sparse.csgraph.johnson(group_matrix, directed=False, indices=None, return_predecessors=False, unweighted=False)
     n = D.shape[0]
     max_value = -1
     selected_center = -1
@@ -127,51 +126,73 @@ def merge_groups(results):
                 groups[key].append(value)
     return groups
 
-
-
 def stop_critery(pointlist,centers,old_centers):
     avg_distances = 0
     for i in range(len(centers)):
-        avg_distances+=scipy.spatial.distance.euclidean(pointlist[centers[i]], pointlist[old_centers[i]])
+        avg_distances+=np.linalg.norm(pointlist[centers[i]]- pointlist[old_centers[i]])
     avg_distances = avg_distances/len(centers)
     if avg_distances < 2:
         return True
     else:
         return False
 
-def fit_desikan(matrix,pointlist,k):
-    if k > 1 and matrix != None:
-        nodes_group = []
-        #centers = get_random_centers(k,matrix)
-        centers = initialize(pointlist,k)
+def parallel_kmeans_ab(Lmatrix,Rmatrix,index_item,k):
+    label = index_item[0]
+    indices = index_item[1]
+    nodes_group = {"L": [], "R": []}
+    hemi = label.split("_")[0]
+    if k>1:
+        if hemi == "L":
+            matrix = Lmatrix
+        else:
+            matrix = Rmatrix
+        parcel_matrix = matrix[0][indices,:][:,indices]
+        point_list = matrix[1]
+
+        centers = get_random_centers(k,parcel_matrix)
+        #centers = initialize(pointlist,k)
         centers_tmp = centers
-        groups = create_groups (centers,matrix)
-
+        groups = create_groups (centers,parcel_matrix)
         for i in range(20):
-            #print("iteración "+str(i))
-            centers = recalc_center(matrix,groups.items())
-
-            noChange = stop_critery(pointlist,centers,centers_tmp)
+            centers = recalc_center(parcel_matrix,groups.items())
+            noChange = stop_critery(point_list,centers,centers_tmp)
             centers_tmp = centers
-            #print("calculando grupos")
-            groups = create_groups(centers, matrix)
+
+            groups = create_groups(centers, parcel_matrix)
             if noChange:
-                #print("salió")
                 break
+            i+=1
         for key,group in groups.items():
-            nodes_group.append(group)
+            group = [indices[i] for i in group]
+            nodes_group[hemi].append(group)
     else:
-        nodes_group = []
+        nodes_group[hemi]= [[indices]]
     return nodes_group
 
-def fit_all(matrix,pointlist,k):
+def merge_dicts(lot):
+    nodes_group = {"L": [], "R": []}
+    for dict in lot:
+        for hemi, groups in dict.items():
+            for group in groups:
+                nodes_group[hemi].append(group)
+    return nodes_group
+
+
+def fit_ab(Lmatrix,Rmatrix,indices,ks):
+
+    pool = mp.Pool(mp.cpu_count())
+    kmeans_ab = partial(parallel_kmeans_ab, Lmatrix,Rmatrix)
+    results = pool.starmap(kmeans_ab, zip([index_item for index_item in indices.items()],[k for k in ks]))
+    nodes_group = merge_dicts(results)
+
+    return nodes_group
+
+def fit_all(matrix,point_list,k):
     if k > 1 and matrix != None:
         nodes_group = []
         centers = get_random_centers(k,matrix)
-        #centers = initialize(pointlist, k)
-        print("centrois inicializados")
+        #centers = initialize(point_list, k)
         centers_tmp = centers
-        print("inicializando grupos")
         groups = create_groups (centers,matrix)
 
         for i in range(20):
@@ -180,7 +201,7 @@ def fit_all(matrix,pointlist,k):
             results = pool.map(centers_fun, [group for group in groups.items()])
             centers = merge_centroids(results)
             pool.close()
-            noChange = stop_critery(pointlist,centers,centers_tmp)
+            noChange = stop_critery(point_list,centers,centers_tmp)
             centers_tmp = centers
             groups = create_groups(centers, matrix)
             if noChange:
