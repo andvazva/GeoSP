@@ -2,7 +2,7 @@
 # Narciso López López
 # Andrea Vázquez Varela
 #Creation date: 19/05/2019
-#Last update: 15/10/2019
+#Last update: 16/10/2019
 
 from classes import *
 import IO
@@ -11,13 +11,14 @@ import geo_kmeans
 import argparse
 import time
 import scipy.sparse as sp
+import collections
 
-
-def create_labels(clusters,npoints):
+def create_labels(clusters,node_list,npoints):
     label = 0
     labels = np.zeros(npoints,dtype = int)
     for points in clusters:
         for p in points:
+            point = node_list[p]
             labels[p] = label
         label+=1
     return labels
@@ -26,12 +27,16 @@ def create_labels(clusters,npoints):
 def create_matrix(points,polygons):
     point_list = {}
     data = {}
+    nodes = collections.OrderedDict()
     for tri in polygons:
         v0,v1,v2 = tri[0], tri[1], tri[2]
+        nodes[v0]=0
+        nodes[v1]=0
+        nodes[v2]=0
         point_list[v0], point_list[v1], point_list[v1] = points[v0], points[v1], points[v2]
 
         data[(v0,v1)] = distance.euclidean(points[v0], points[v1])
-        data[(v0,v1)] = distance.euclidean(points[v0], points[v2])
+        data[(v0,v2)] = distance.euclidean(points[v0], points[v2])
         data[(v1,v2)] = distance.euclidean(points[v1], points[v2])
 
 
@@ -41,13 +46,13 @@ def create_matrix(points,polygons):
 
     matrix = sp.csr_matrix((values, (row_ind, col_ind)))
 
-    return matrix,point_list
+    return matrix,point_list,list(nodes)
 
 
 def all_parcellation(points,polygons,k):
-    matrix,point_list = create_matrix(points,polygons)
+    matrix,point_list,node_list = create_matrix(points,polygons)
     clusters = geo_kmeans.fit_all(matrix,point_list,k)
-    labels = create_labels(clusters,len(points))
+    labels = create_labels(clusters,node_list,len(points))
 
     return labels
 
@@ -62,8 +67,6 @@ def main():
     parser.add_argument('--d', type=int, default = 0, help='1 to use Desikan atlas, 0 to use all brain')
     parser.add_argument('--output-path', type=str, help='Output directory')
     args = parser.parse_args()
-
-
 
     Lmesh_path = args.Lobj
     Rmesh_path = args.Robj
