@@ -46,8 +46,8 @@ Delivery as a result, the entry atlas parcellated. Each anatomic parcel of the a
 - **--Rlabels**: Input file with right labels **(Only for Atlas-Based parcellation)**
 - **--Lk-file**: Input file with left ks **(Only for Atlas-Based parcellation)**
 - **--Rk-file**: Input file with right ks **(Only for Atlas-Based parcellation)**
-- **--Lk**: Number of parcels for left hemisphere **(Only for all cortex parcellation)**
-- **--Rk**: Number of parcels for rigth hemisphere **(Only for all cortex parcellation)**
+- **--Lk**: Number of sub-parcels for left hemisphere **(Only for all cortex parcellation)**
+- **--Rk**: Number of sub-parcels for rigth hemisphere **(Only for all cortex parcellation)**
 - **--AB**: Atlas-Based, 1 to subdivide other atlas (like Desikan), 0 to use all brain. Is 0 by default
 
 ## Input/output data format
