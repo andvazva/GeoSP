@@ -73,3 +73,4 @@ In the image below the atlas-based splitting is shown for the sample data provid
 The method results in 92 parcels in the left hemisphere and 90 in the right hemisphere (which has been established in the files Lk-file.txt and Rk-file.txt)
 ![alt text](https://raw.githubusercontent.com/andvazva/GeoSP/master/img/atlas_based.PNG)
 
+ 
