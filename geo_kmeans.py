@@ -10,9 +10,6 @@ import numpy as np
 import multiprocessing as mp
 from functools import partial
 
-distances = {}
-nodes_map = {} #Mapa que contiene los índices de los nodos como clave y los objetos como valor
-
 
 def get_random_centers(k,matrix):
     random_centers = []
@@ -49,7 +46,7 @@ def create_groups(centers,matrix):
         dist_matrices[c] = scipy.sparse.csgraph.dijkstra(matrix, directed=False, indices=c, return_predecessors=False, unweighted=False)
 
     for node in set(matrix.indices):
-        min = 10000000
+        min = 1000
         selected_center = -1
         for c,matrix in dist_matrices.items():
             if matrix[node] < min:
@@ -150,7 +147,7 @@ def parallel_kmeans_ab(Lmatrix,Rmatrix,index_item,k):
         point_list = matrix[1]
 
         #centers = get_random_centers(k,parcel_matrix)
-        points_init = [point_list[i] for i in indices]
+        points_init = list(point_list[i] for i in indices)
         centers = initialize(points_init,k)
         centers_tmp = centers
         groups = create_groups (centers,parcel_matrix)

@@ -83,7 +83,7 @@ def create_matrix(points, polygons):
     values = list(v for k,v in data.items())
     matrix = sp.csr_matrix((values, (row_ind, col_ind)))
 
-    return matrix,point_list,node_list
+    return matrix,point_list
 
 def get_indices(labels,hemi):
     indices = collections.OrderedDict()
@@ -98,7 +98,7 @@ def get_indices(labels,hemi):
 
 def all_parcellation(mesh,k):
     points, polygons = mesh.points, mesh.polygons
-    matrix,point_list,node_list = create_matrix(points,polygons)
+    matrix,point_list = create_matrix(points,polygons)
     clusters = geo_kmeans.fit_all(matrix,point_list,k)
     labels = create_labels(clusters,len(points))
     return labels
