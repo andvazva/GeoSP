@@ -1,6 +1,6 @@
 # GeoSP
 
-This software implements the K-means method with geodetic distance to parcellate the cerebral cortex given the number of parcels, k.
+This software implements the K-means method with geodesic distance to parcellate the cerebral cortex given the number of parcels, k.
 
 The parcellation can be done in two ways: 
 - Whole cortex parcellation: Parcellate the entire cerebral cortex, receiving a k for each hemisphere.
