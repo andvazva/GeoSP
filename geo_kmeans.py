@@ -149,8 +149,9 @@ def parallel_kmeans_ab(Lmatrix,Rmatrix,index_item,k):
         parcel_matrix = matrix[0][indices,:][:,indices]
         point_list = matrix[1]
 
-        centers = get_random_centers(k,parcel_matrix)
-        #centers = initialize(pointlist,k)
+        #centers = get_random_centers(k,parcel_matrix)
+        points_init = [point_list[i] for i in indices]
+        centers = initialize(points_init,k)
         centers_tmp = centers
         groups = create_groups (centers,parcel_matrix)
         for i in range(20):

@@ -12,6 +12,23 @@ import time
 import scipy.sparse as sp
 import collections
 
+def create_sp_map(labels,labels_atlas):
+    sp_map = {}
+    for i in range(len(labels)):
+        atlas_label = labels_atlas[i]
+        new_label = labels[i]
+        if atlas_label not in sp_map:
+            sp_map[atlas_label] = set([new_label])
+        else:
+            sp_map[atlas_label].add(new_label)
+    return sp_map
+
+def create_subparcels(Llabels_atlas,Rlabels_atlas,Llabels,Rlabels):
+    Lsp_map = create_sp_map(Llabels,Llabels_atlas)
+    Rsp_map = create_sp_map(Rlabels,Rlabels_atlas)
+
+    return Lsp_map, Rsp_map
+
 def create_labels(clusters,npoints):
     label = 0
     labels = np.zeros(npoints,dtype = int)
@@ -46,7 +63,6 @@ def create_matrix(points, polygons):
     nodes = collections.OrderedDict()
     for tri in polygons:
         v0,v1,v2 = tri[0], tri[1], tri[2]
-        vertices = [v0,v1,v2]
         nodes[v0], nodes[v1], nodes[v2] = 0, 0, 0
 
         dist01 = np.linalg.norm(points[v0] - points[v1])
@@ -100,6 +116,8 @@ def ab_parcellation(LMesh,RMesh,Llabels,Rlabels,Lk,Rk):
     Llabels, Rlabels = create_labels_ab(clusters,len(LMesh.points),len(RMesh.points))
     return Llabels,Rlabels
 
+
+
 def main():
 
     parser = argparse.ArgumentParser(description='Geodesic Parcelation')
@@ -126,18 +144,22 @@ def main():
         Rlabels = all_parcellation(RMesh, args.Rk)
 
     else:
-        Llabels = IO.read_labels(args.Llabels)
-        Rlabels = IO.read_labels(args.Rlabels)
+        Llabels_atlas = IO.read_labels(args.Llabels)
+        Rlabels_atlas = IO.read_labels(args.Rlabels)
         Lk = IO.read_labels(args.Lk_file)
         Rk = IO.read_labels(args.Rk_file)
-        Llabels, Rlabels = ab_parcellation(LMesh,RMesh,Llabels,Rlabels,Lk,Rk)
+        Llabels, Rlabels = ab_parcellation(LMesh,RMesh,Llabels_atlas,Rlabels_atlas,Lk,Rk)
+        Lsp_map,Rsp_map = create_subparcels(Llabels_atlas,Rlabels_atlas,Llabels,Rlabels)
 
     end = time.time()
-    print("Execution time of kmeans: "+str(round(end-init))+" seconds")
+    print("Execution time of kmeans: "+str(round(end-init,2))+" seconds")
 
     IO.write_labels(Llabels, args.output_path,"L")
     IO.write_labels(Rlabels, args.output_path,"R")
 
+    if args.AB == 1:
+        IO.write_sparcels(Lsp_map, args.output_path,"L")
+        IO.write_sparcels(Rsp_map, args.output_path,"R")
 
 if __name__ == '__main__':
     main()
