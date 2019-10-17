@@ -1,6 +1,6 @@
 # GeoSP
 
-This software implements the K-means method with geodesic distance to parcellate the cerebral cortex given the number of parcels, k.
+This software implements the K-means method with geodesic distance to parcellate the cerebral cortex given the number of sub-parcels, k.
 
 The parcellation can be done in two ways: 
 - Whole cortex parcellation: Parcellate the entire cerebral cortex, receiving a k for each hemisphere.
@@ -32,12 +32,12 @@ sudo apt install python3-scipy
 ```
 python3 main.py --Lobj input_data/lh.pial.obj --Robj input_data/rh.pial.obj --Lk 35 --Rk 35 --output-path output_atlas
 ```
-It gives as a result the cortex divided into 35 parcels in the left hemisphere and another 35 in the right hemisphere.
+It gives as a result the cortex divided into 35 anatomic parcels in the left hemisphere and another 35 in the right hemisphere.
 ### Atlas-based parcellation
 ```
 python3 main.py --Lobj input_data/lh.pial.obj --Robj input_data/rh.pial.obj --Lk-file input_data/example_atlas/Lk.txt --Rk-file input_data/example_atlas/Rk.txt --Llabels input_data/example_atlas/Llabels.txt --Rlabels input_data/example_atlas/Rlabels.txt --AB 1 --output-path output_atlas
 ```
-Delivery as a result, the entry atlas parcellated. Each parcel of the atlas is divided according to the k of the files Lk.txt and Rk.txt
+Delivery as a result, the entry atlas parcellated. Each anatomic parcel of the atlas is divided according to the k of the files Lk.txt and Rk.txt
 
 ## Input parameters
 - **--Lobj**: Left mesh .obj of subject
