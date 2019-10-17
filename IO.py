@@ -20,31 +20,6 @@ def read_labels(path):
         labels = list([int(l) for l in line.split()][0] for line in lines)
     return labels
 
-#Lee los valores de k para kmeans
-def read_k(path):
-    k = []
-    file = open(path,"r+")
-    lines = file.readlines()
-    for line in lines:
-        k.append(int(line.split(" ")[1]))
-    file.close()
-    return k
-
-#Escribe la información de las parcelas duras del atlas
-def write_hparcels(aparcels,atlas_path,hemi):
-    file_path = atlas_path+"/"+hemi+"hard_parcels.txt"
-    f = open(file_path,"w+")
-    for ap in aparcels:
-        if len(ap.sub_parcels) > 0:
-            f.write("ap "+str(ap.label)+"\n") #Anatomic parcel
-            for hp in ap.sub_parcels:
-                if len(hp.triangles)>0:
-                    f.write("hp " + str(hp.label) + "\n")  # hard parcel
-                    f.write("t")
-                    for t in hp.triangles:  #Se escriben los índices de los triángulos
-                        f.write(" "+str(t.index))
-                    f.write("\n")
-    f.close()
 
 def write_labels(labels,atlas_path,hemi):
     file_path = atlas_path+"/"+hemi+"labels.txt"
@@ -52,3 +27,10 @@ def write_labels(labels,atlas_path,hemi):
     for label in labels:
         f.write(str(label)+"\n")
     f.close()
+
+def write_sparcels(sp_map, path,hemi):
+    with open(path+"/"+hemi+"sparcels.txt","w+") as f:
+        for key,values in sp_map.items():
+            f.write(str(key)+": ")
+            f.write(" ".join(list(map(str,values))))
+            f.write("\n")
