@@ -65,12 +65,12 @@ Sample data is provided in the input_data/example_atlas/ folder for the code to 
 ## Results
 ### All cortex parcellation
 
-The image below shows the result of the parcelation for the entire cortex with Lk = 35 and Rk = 35 (which are the same k as the Desikan atlas).
+The image below shows the result of the parcellation for the entire cortex with Lk = 35 and Rk = 35 (which are the same k as the Desikan atlas).
 ![alt text](https://raw.githubusercontent.com/andvazva/GeoSP/master/img/all_cortex.PNG)
 
 ### Atlas-Based parcellation
 In the image below the atlas-based splitting is shown for the sample data provided. The input atlas has Lk = 35 and Rk = 35.
-The method results in 92 parcels in the left hemisphere and 90 in the right hemisphere (which has been established in the files Lk-file.txt and Rk-file.txt)
+The method results in 92 sub-parcels in the left hemisphere and 90 sub-parcels in the right hemisphere (which has been established in the files Lk-file.txt and Rk-file.txt)
 ![alt text](https://raw.githubusercontent.com/andvazva/GeoSP/master/img/atlas_based.PNG)
 
  
