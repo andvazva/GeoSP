@@ -1,3 +1,9 @@
+#Authors:
+# Narciso López López
+# Andrea Vázquez Varela
+#Creation date: 19/05/2019
+#Last update: 16/10/2019
+
 import shutil
 import os
 
