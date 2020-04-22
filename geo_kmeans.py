@@ -8,7 +8,7 @@
 # Narciso López López
 # Andrea Vázquez Varela
 #Creation date: 19/05/2019
-#Last update: 16/10/2019
+#Last update: 22/04/2020
 
 import random
 import scipy
@@ -155,17 +155,16 @@ def parallel_kmeans_ab(Lmatrix,Rmatrix,index_item,k):
         #centers = get_random_centers(k,parcel_matrix)
         points_init = list(point_list[i] for i in indices)
         centers = initialize(points_init,k)
-        centers_tmp = centers
-        groups = create_groups (centers,parcel_matrix)
-        for i in range(20):
-            centers = recalc_center(parcel_matrix,groups.items())
-            noChange = stop_critery(point_list,centers,centers_tmp)
-            centers_tmp = centers
+        centers_old = centers
 
-            groups = create_groups(centers, parcel_matrix)
+        for i in range(20):
+            groups = create_groups (centers,parcel_matrix)
+            centers = recalc_center(parcel_matrix,groups.items())
+            noChange = stop_critery(point_list,centers,centers_old)
+            centers_old = centers
+
             if noChange:
                 break
-            i+=1
         for key,group in groups.items():
             group = [indices[i] for i in group]
             nodes_group[hemi].append(group)
@@ -196,18 +195,17 @@ def fit_all(matrix,point_list,k):
         nodes_group = []
         centers = get_random_centers(k,matrix)
         #centers = initialize(point_list, k)
-        centers_tmp = centers
-        groups = create_groups (centers,matrix)
+        centers_old = centers
 
         for i in range(20):
+            groups = create_groups(centers,matrix)
             pool = mp.Pool(mp.cpu_count())
             centers_fun = partial(recalc_center_all, matrix)
             results = pool.map(centers_fun, [group for group in groups.items()])
             centers = merge_centroids(results)
             pool.close()
-            noChange = stop_critery(point_list,centers,centers_tmp)
-            centers_tmp = centers
-            groups = create_groups(centers, matrix)
+            noChange = stop_critery(point_list,centers,centers_old)
+            centers_old = centers
             if noChange:
                 break
         for key,group in groups.items():
