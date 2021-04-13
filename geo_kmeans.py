@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright (C) 2019,  Andrea Vázquez Varela
 # All rights reserved.
 
